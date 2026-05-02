@@ -20,6 +20,7 @@
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "noFallthroughCasesInSwitch": false,
+    // Base URL still needed for NestJS to resolve paths correctly
     "baseUrl": "./",
     "paths": {
       "@app/common": [
