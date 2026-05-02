@@ -1,4 +1,15 @@
 services:
+  postgres:
+    image: postgres:17
+    container_name: orders-postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
   orders-service:
     build:
       context: .
@@ -16,8 +27,6 @@ services:
       - '9229:9229'
     volumes:
       - .:/usr/src/app
-      - /usr/src/app/node_modules
-
   audit-service:
     build:
       context: .
@@ -35,4 +44,6 @@ services:
       - '9230:9229'
     volumes:
       - .:/usr/src/app
-      - /usr/src/app/node_modules
+
+volumes:
+  postgres_data:

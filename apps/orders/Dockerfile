@@ -13,7 +13,7 @@ COPY nest-cli.json ./
 
 RUN npm install -g pnpm
 
-RUN pnpm install --frozen-lockfile
+RUN pnpm install
 
 # Copy all files
 COPY apps/orders ./apps/orders
