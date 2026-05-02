@@ -28,6 +28,5 @@
         "./libs/common/src/*"
       ]
     },
-    "baseUrl": "./"
   }
 }
