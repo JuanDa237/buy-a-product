@@ -1,34 +1,24 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { ConfigModule } from '@nestjs/config';
 
 // App
-import { OrdersController } from './orders.controller';
-import { OrdersService } from './orders.service';
+import { OrdersController } from './orders/controllers/orders.controller';
+import { OrdersService } from './orders/services/orders.service';
+import { Order } from './orders/entities/order.entity';
+import { OrdersRepository } from './orders/repositories/orders.repository';
 
 // Libs
 import { HealthModule } from '@app/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { SqlDatabaseModule } from '@app/common/database';
 
 @Module({
   imports: [
     HealthModule,
     ConfigModule.forRoot({ isGlobal: true }),
-    TypeOrmModule.forRootAsync({
-            imports: [ConfigModule],
-            useFactory: (configService: ConfigService) => ({
-                type: 'postgres',
-                host: configService.get<string>('POSTGRES_HOST', 'localhost'),
-                port: configService.get<number>('POSTGRES_PORT', 5432),
-                username: configService.get<string>('POSTGRES_USER', 'postgres'),
-                password: configService.get<string>('POSTGRES_PASSWORD', 'postgres'),
-                database: configService.get<string>('POSTGRES_DB', 'orders'),
-                entities: [],
-                synchronize: configService.get<string>('NODE_ENV', 'development') === 'development',
-            }),
-            inject: [ConfigService],
-        }),
+    SqlDatabaseModule,
+    SqlDatabaseModule.forFeature([Order]),
   ],
   controllers: [OrdersController],
-  providers: [OrdersService],
+  providers: [OrdersService, OrdersRepository],
 })
 export class OrdersModule {}
