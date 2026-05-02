@@ -3,6 +3,7 @@ import { Repository } from 'typeorm';
 
 import { OrdersRepository } from './orders.repository';
 import { Order } from '../entities/order.entity';
+import { OrderStatus } from '../enums/order-status.enum';
 
 describe('OrdersRepository', () => {
   let repository: OrdersRepository;
@@ -10,6 +11,7 @@ describe('OrdersRepository', () => {
     findOne: jest.Mock;
     create: jest.Mock;
     save: jest.Mock;
+    update: jest.Mock;
   };
 
   beforeEach(() => {
@@ -17,6 +19,7 @@ describe('OrdersRepository', () => {
       findOne: jest.fn(),
       create: jest.fn(),
       save: jest.fn(),
+      update: jest.fn(),
     };
 
     repository = new OrdersRepository(
@@ -49,5 +52,24 @@ describe('OrdersRepository', () => {
   it('defines a Logger instance', () => {
     const logger = (repository as unknown as { logger: Logger }).logger;
     expect(logger).toBeInstanceOf(Logger);
+  });
+
+  it('updates order status', async () => {
+    const orderId = 'order-1';
+    const newStatus = OrderStatus.CONFIRMED;
+    const updatedOrder = { id: orderId, status: newStatus } as Order;
+
+    typeormRepository.update.mockResolvedValue({ affected: 1 });
+
+    const findByIdMock = jest.fn().mockResolvedValue(updatedOrder);
+    repository.findById = findByIdMock;
+
+    await expect(repository.updateStatus(orderId, newStatus)).resolves.toEqual(
+      updatedOrder,
+    );
+    expect(typeormRepository.update).toHaveBeenCalledWith(orderId, {
+      status: newStatus,
+    });
+    expect(findByIdMock).toHaveBeenCalledWith(orderId);
   });
 });

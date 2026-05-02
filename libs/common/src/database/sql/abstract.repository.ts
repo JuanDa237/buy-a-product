@@ -6,7 +6,7 @@ import { FindOptionsWhere, Repository } from 'typeorm';
 export abstract class AbstractRepository<TDoc extends AbstractEntity> {
   protected abstract readonly logger: Logger;
 
-  constructor(private readonly repo: Repository<TDoc>) {}
+  constructor(public readonly repo: Repository<TDoc>) {}
 
   async findById(id: string): Promise<TDoc> {
     const entity = await this.repo.findOne({

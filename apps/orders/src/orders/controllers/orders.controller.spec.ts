@@ -9,6 +9,7 @@ describe('OrdersController', () => {
   let ordersService: {
     create: jest.Mock;
     findOne: jest.Mock;
+    updateStatus: jest.Mock;
   };
 
   const orderResponse = {
@@ -24,6 +25,7 @@ describe('OrdersController', () => {
     ordersService = {
       create: jest.fn(),
       findOne: jest.fn(),
+      updateStatus: jest.fn(),
     };
 
     const app: TestingModule = await Test.createTestingModule({
@@ -61,6 +63,21 @@ describe('OrdersController', () => {
         orderResponse,
       );
       expect(ordersService.findOne).toHaveBeenCalledWith(id);
+    });
+  });
+
+  describe('updateStatus', () => {
+    it('delegates to service and returns updated order', async () => {
+      const id = 'f7932cad-af29-460e-938f-2ec9e57c0a33';
+      const dto = { status: OrderStatus.CONFIRMED };
+      const updatedOrder = { ...orderResponse, status: OrderStatus.CONFIRMED };
+
+      ordersService.updateStatus.mockResolvedValue(updatedOrder);
+
+      await expect(ordersController.updateStatus(id, dto)).resolves.toEqual(
+        updatedOrder,
+      );
+      expect(ordersService.updateStatus).toHaveBeenCalledWith(id, dto);
     });
   });
 });
