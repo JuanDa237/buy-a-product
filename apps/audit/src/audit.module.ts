@@ -1,6 +1,10 @@
 import { Module } from '@nestjs/common';
-import { AuditController } from './audit.controller';
-import { AuditService } from './audit.service';
+
+// App
+import { AuditService } from './audit/services/audit.service';
+import { AuditController } from './audit/controllers/audit.controller';
+
+// Libs
 import { HealthModule } from '@app/common';
 
 @Module({

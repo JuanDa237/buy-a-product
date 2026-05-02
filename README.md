@@ -74,8 +74,21 @@ then in the docker compose file that port is mapped diferently for every microse
 in the vs code launch.json you have the configuration to attacht to every microservice
 
 ### How to install git kraken in the ubuntu machine
+
 [WSL GitKraken](https://help.gitkraken.com/gitkraken-desktop/windows-subsystem-for-linux/)
 
 ```
 gitkraken
 ```
+
+### TEST
+
+In the package json i excluded the e2e tests, the main.ts and the modules.
+
+"collectCoverageFrom": [
+"**/*.(t|j)s",
+"!**/test/**",
+"!**/*.spec.ts",
+"!**/main.ts",
+"!**/*.module.ts"
+],

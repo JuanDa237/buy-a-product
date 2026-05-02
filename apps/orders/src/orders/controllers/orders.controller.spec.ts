@@ -1,22 +1,66 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { OrdersController } from './orders.controller';
 import { OrdersService } from '../services/orders.service';
+import { CreateOrderDto } from '../dto/create-order.dto';
+import { OrderStatus } from '../enums/order-status.enum';
 
 describe('OrdersController', () => {
   let ordersController: OrdersController;
+  let ordersService: {
+    create: jest.Mock;
+    findOne: jest.Mock;
+  };
+
+  const orderResponse = {
+    id: 'f7932cad-af29-460e-938f-2ec9e57c0a33',
+    productId: 'product-1',
+    quantity: 2,
+    userId: 'user-1',
+    totalAmount: 150,
+    status: OrderStatus.PENDING,
+  };
 
   beforeEach(async () => {
+    ordersService = {
+      create: jest.fn(),
+      findOne: jest.fn(),
+    };
+
     const app: TestingModule = await Test.createTestingModule({
       controllers: [OrdersController],
-      providers: [OrdersService],
+      providers: [{ provide: OrdersService, useValue: ordersService }],
     }).compile();
 
     ordersController = app.get<OrdersController>(OrdersController);
   });
 
-  describe('root', () => {
-    it('should return "Hello World!"', () => {
-      expect(ordersController.getHello()).toBe('Hello World!');
+  describe('create', () => {
+    it('delegates to service and returns created order', async () => {
+      const dto: CreateOrderDto = {
+        productId: 'product-1',
+        quantity: 2,
+        userId: 'user-1',
+        totalAmount: 150,
+      };
+
+      ordersService.create.mockResolvedValue(orderResponse);
+
+      await expect(ordersController.create(dto)).resolves.toEqual(
+        orderResponse,
+      );
+      expect(ordersService.create).toHaveBeenCalledWith(dto);
+    });
+  });
+
+  describe('findOne', () => {
+    it('delegates to service and returns a single order', async () => {
+      const id = 'f7932cad-af29-460e-938f-2ec9e57c0a33';
+      ordersService.findOne.mockResolvedValue(orderResponse);
+
+      await expect(ordersController.findOne(id)).resolves.toEqual(
+        orderResponse,
+      );
+      expect(ordersService.findOne).toHaveBeenCalledWith(id);
     });
   });
 });
