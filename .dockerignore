@@ -1,0 +1,16 @@
+node_modules
+pnpm-store
+.pnpm-store
+.npm
+.git
+.gitignore
+.vscode
+.idea
+.agents
+dist
+coverage
+*.log
+.env
+.env.*
+Dockerfile*
+**/*.md

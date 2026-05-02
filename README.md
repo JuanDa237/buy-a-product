@@ -8,3 +8,7 @@
 
     nest generate lib x-name
     nest generate app x-name
+
+## DOCKER
+
+    docker compose up --build

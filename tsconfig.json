@@ -20,12 +20,13 @@
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "noFallthroughCasesInSwitch": false,
+    "baseUrl": "./",
     "paths": {
       "@app/common": [
-        "./libs/common/src"
+        "libs/common/src"
       ],
       "@app/common/*": [
-        "./libs/common/src/*"
+        "libs/common/src/*"
       ]
     },
     "types": ["node", "jest"]

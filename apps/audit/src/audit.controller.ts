@@ -5,7 +5,7 @@ import { AuditService } from './audit.service';
 export class AuditController {
   constructor(private readonly auditService: AuditService) {}
 
-  @Get()
+  @Get('hello')
   getHello(): string {
     return this.auditService.getHello();
   }
