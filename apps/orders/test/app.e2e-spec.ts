@@ -4,7 +4,7 @@ import request from 'supertest';
 import { HealthModule } from '@app/common';
 import { OrdersController } from '../src/orders/controllers/orders.controller';
 import { OrdersService } from '../src/orders/services/orders.service';
-import { OrderStatus } from '../src/orders/enums/order-status.enum';
+import { OrderStatus } from '@app/orders-common';
 import { Server } from 'http';
 
 interface HealthResponse {

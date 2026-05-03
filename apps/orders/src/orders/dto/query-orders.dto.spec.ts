@@ -2,7 +2,7 @@ import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
 
 import { QueryOrdersDto } from './query-orders.dto';
-import { OrderStatus } from '../enums/order-status.enum';
+import { OrderStatus } from '@app/orders-common';
 
 describe('QueryOrdersDto', () => {
   it('is valid with correct payload', async () => {

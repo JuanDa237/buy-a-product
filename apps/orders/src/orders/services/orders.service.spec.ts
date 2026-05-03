@@ -1,7 +1,7 @@
 import { OrdersService } from './orders.service';
 import { OrdersRepository } from '../repositories/orders.repository';
 import { CreateOrderDto } from '../dto/create-order.dto';
-import { OrderStatus } from '../enums/order-status.enum';
+import { OrderStatus } from '@app/orders-common';
 
 describe('OrdersService', () => {
   let service: OrdersService;

@@ -1,13 +1,13 @@
 import { Logger } from '@nestjs/common';
 
-import { AbstractRepository } from '@app/common/features/database';
+import { AbstractEntityRepository } from '@app/common/features/database';
 import { Order } from '../entities/order.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { OrderStatus } from '../enums/order-status.enum';
+import { OrderStatus } from '@app/orders-common';
 import { FindAllOptions } from '../interfaces/find-all-options';
 
-export class OrdersRepository extends AbstractRepository<Order> {
+export class OrdersRepository extends AbstractEntityRepository<Order> {
   protected readonly logger: Logger = new Logger(OrdersRepository.name);
 
   constructor(@InjectRepository(Order) repo: Repository<Order>) {

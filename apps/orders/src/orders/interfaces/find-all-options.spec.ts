@@ -1,4 +1,4 @@
-import { OrderStatus } from '../enums/order-status.enum';
+import { OrderStatus } from '@app/orders-common';
 import { FindAllOptions } from './find-all-options';
 
 describe('FindAllOptions', () => {

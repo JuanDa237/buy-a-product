@@ -2,13 +2,13 @@ import { BadRequestException, Logger, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 
 import { AbstractEntity } from './abstract.entity';
-import { AbstractRepository } from './abstract.repository';
+import { AbstractEntityRepository } from './abstract-entity.repository';
 
 class TestEntity extends AbstractEntity {
   name!: string;
 }
 
-class TestRepository extends AbstractRepository<TestEntity> {
+class TestRepository extends AbstractEntityRepository<TestEntity> {
   protected readonly logger = {
     warn: jest.fn(),
     error: jest.fn(),
@@ -21,7 +21,7 @@ class TestRepository extends AbstractRepository<TestEntity> {
   } as unknown as Logger;
 }
 
-describe('AbstractRepository', () => {
+describe('AbstractEntityRepository', () => {
   let repository: TestRepository;
   let typeormRepository: {
     findOne: jest.Mock;

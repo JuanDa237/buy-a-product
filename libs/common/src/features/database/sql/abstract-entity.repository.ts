@@ -3,7 +3,7 @@ import { BadRequestException, Logger, NotFoundException } from '@nestjs/common';
 import { AbstractEntity } from './abstract.entity';
 import { FindOptionsWhere, Repository } from 'typeorm';
 
-export abstract class AbstractRepository<TDoc extends AbstractEntity> {
+export abstract class AbstractEntityRepository<TDoc extends AbstractEntity> {
   protected abstract readonly logger: Logger;
 
   constructor(public readonly repo: Repository<TDoc>) {}

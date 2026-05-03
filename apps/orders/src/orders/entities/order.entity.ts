@@ -1,6 +1,6 @@
 import { Entity, Column } from 'typeorm';
-import { OrderStatus } from '../enums/order-status.enum';
 import { AbstractEntity } from '@app/common/features/database';
+import { OrderStatus } from '@app/orders-common';
 
 @Entity('orders')
 export class Order extends AbstractEntity {

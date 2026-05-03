@@ -3,7 +3,7 @@ import { Repository } from 'typeorm';
 
 import { OrdersRepository } from './orders.repository';
 import { Order } from '../entities/order.entity';
-import { OrderStatus } from '../enums/order-status.enum';
+import { OrderStatus } from '@app/orders-common';
 
 describe('OrdersRepository', () => {
   let repository: OrdersRepository;

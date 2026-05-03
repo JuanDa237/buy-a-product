@@ -10,15 +10,6 @@
   "monorepo": true,
   "root": "apps/orders",
   "projects": {
-    "orders": {
-      "type": "application",
-      "root": "apps/orders",
-      "entryFile": "main",
-      "sourceRoot": "apps/orders/src",
-      "compilerOptions": {
-        "tsConfigPath": "apps/orders/tsconfig.app.json"
-      }
-    },
     "audit": {
       "type": "application",
       "root": "apps/audit",
@@ -35,6 +26,24 @@
       "sourceRoot": "libs/common/src",
       "compilerOptions": {
         "tsConfigPath": "libs/common/tsconfig.lib.json"
+      }
+    },
+    "orders": {
+      "type": "application",
+      "root": "apps/orders",
+      "entryFile": "main",
+      "sourceRoot": "apps/orders/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/orders/tsconfig.app.json"
+      }
+    },
+    "orders-common": {
+      "type": "library",
+      "root": "libs/orders-common",
+      "entryFile": "index",
+      "sourceRoot": "libs/orders-common/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/orders-common/tsconfig.lib.json"
       }
     }
   }

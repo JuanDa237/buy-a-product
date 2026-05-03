@@ -1,8 +1,10 @@
 import {
   AUDIT_SERVICE,
+  ORDERS_SERVICE,
   HealthController,
   HealthModule,
-  ORDERS_SERVICE,
+  NoSqlDatabaseModule,
+  SqlDatabaseModule,
 } from '.';
 
 describe('common public API', () => {
@@ -11,5 +13,7 @@ describe('common public API', () => {
     expect(AUDIT_SERVICE).toBe('AUDIT_SERVICE');
     expect(HealthController).toBeDefined();
     expect(HealthModule).toBeDefined();
+    expect(SqlDatabaseModule).toBeDefined();
+    expect(NoSqlDatabaseModule).toBeDefined();
   });
 });

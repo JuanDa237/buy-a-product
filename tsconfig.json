@@ -20,7 +20,6 @@
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "noFallthroughCasesInSwitch": false,
-    // Base URL still needed for NestJS to resolve paths correctly
     "baseUrl": "./",
     "paths": {
       "@app/common": [
@@ -28,8 +27,17 @@
       ],
       "@app/common/*": [
         "libs/common/src/*"
+      ],
+      "@app/orders-common": [
+        "libs/orders-common/src"
+      ],
+      "@app/orders-common/*": [
+        "libs/orders-common/src/*"
       ]
     },
-    "types": ["node", "jest"]
+    "types": [
+      "node",
+      "jest"
+    ]
   }
 }

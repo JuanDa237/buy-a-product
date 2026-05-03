@@ -1,6 +1,6 @@
 import { IsOptional, IsEnum, IsString, IsInt, Min } from 'class-validator';
 import { Type } from 'class-transformer';
-import { OrderStatus } from '../enums/order-status.enum';
+import { OrderStatus } from '@app/orders-common';
 
 export class QueryOrdersDto {
   @IsOptional()
