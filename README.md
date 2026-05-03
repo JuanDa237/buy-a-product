@@ -92,3 +92,9 @@ In the package json i excluded the e2e tests, the main.ts and the modules.
 "!**/main.ts",
 "!**/*.module.ts"
 ],
+
+Because of the class transformer
+
+"setupFiles": [
+"reflect-metadata"
+],

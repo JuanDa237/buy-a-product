@@ -9,6 +9,7 @@ describe('OrdersService', () => {
     create: jest.Mock;
     findById: jest.Mock;
     updateStatus: jest.Mock;
+    findAll: jest.Mock;
   };
 
   beforeEach(() => {
@@ -16,6 +17,7 @@ describe('OrdersService', () => {
       create: jest.fn(),
       findById: jest.fn(),
       updateStatus: jest.fn(),
+      findAll: jest.fn(),
     };
 
     service = new OrdersService(
@@ -43,6 +45,18 @@ describe('OrdersService', () => {
     expect(ordersRepository.create).toHaveBeenCalledWith({
       ...dto,
       status: OrderStatus.PENDING,
+    });
+  });
+
+  describe('findAll', () => {
+    it('delegates to repository findAll with correct parameters', async () => {
+      const query = { page: 1, limit: 10, status: OrderStatus.PENDING };
+      const result = { data: [], total: 0 };
+
+      ordersRepository.findAll.mockResolvedValue(result);
+
+      await expect(service.findAll(query)).resolves.toEqual(result);
+      expect(ordersRepository.findAll).toHaveBeenCalledWith(query);
     });
   });
 

@@ -12,6 +12,7 @@ describe('OrdersRepository', () => {
     create: jest.Mock;
     save: jest.Mock;
     update: jest.Mock;
+    createQueryBuilder: jest.Mock;
   };
 
   beforeEach(() => {
@@ -20,6 +21,7 @@ describe('OrdersRepository', () => {
       create: jest.fn(),
       save: jest.fn(),
       update: jest.fn(),
+      createQueryBuilder: jest.fn(),
     };
 
     repository = new OrdersRepository(
@@ -54,22 +56,103 @@ describe('OrdersRepository', () => {
     expect(logger).toBeInstanceOf(Logger);
   });
 
-  it('updates order status', async () => {
-    const orderId = 'order-1';
-    const newStatus = OrderStatus.CONFIRMED;
-    const updatedOrder = { id: orderId, status: newStatus } as Order;
+  describe('findAll', () => {
+    it('returns paginated orders with filters', async () => {
+      const options = { page: 1, limit: 10, status: OrderStatus.PENDING };
+      const orders = [
+        { id: 'order-1', status: OrderStatus.PENDING },
+        { id: 'order-2', status: OrderStatus.PENDING },
+      ] as Order[];
+      const total = 2;
 
-    typeormRepository.update.mockResolvedValue({ affected: 1 });
+      const createQueryBuilderMock = {
+        andWhere: jest.fn().mockReturnThis(),
+        orderBy: jest.fn().mockReturnThis(),
+        skip: jest.fn().mockReturnThis(),
+        take: jest.fn().mockReturnThis(),
+        getManyAndCount: jest.fn().mockResolvedValue([orders, total]),
+      };
 
-    const findByIdMock = jest.fn().mockResolvedValue(updatedOrder);
-    repository.findById = findByIdMock;
+      typeormRepository.createQueryBuilder = jest
+        .fn()
+        .mockReturnValue(createQueryBuilderMock);
 
-    await expect(repository.updateStatus(orderId, newStatus)).resolves.toEqual(
-      updatedOrder,
-    );
-    expect(typeormRepository.update).toHaveBeenCalledWith(orderId, {
-      status: newStatus,
+      await expect(repository.findAll(options)).resolves.toEqual({
+        data: orders,
+        total,
+      });
+      expect(typeormRepository.createQueryBuilder).toHaveBeenCalledWith(
+        'order',
+      );
+      expect(createQueryBuilderMock.andWhere).toHaveBeenCalledWith(
+        'order.status = :status',
+        { status: options.status },
+      );
+      expect(createQueryBuilderMock.orderBy).toHaveBeenCalledWith(
+        'order.createdAt',
+        'DESC',
+      );
+      expect(createQueryBuilderMock.skip).toHaveBeenCalledWith(0);
+      expect(createQueryBuilderMock.take).toHaveBeenCalledWith(10);
+      expect(createQueryBuilderMock.getManyAndCount).toHaveBeenCalled();
     });
-    expect(findByIdMock).toHaveBeenCalledWith(orderId);
+
+    it('applies userId filter if provided', async () => {
+      const options = {
+        page: 1,
+        limit: 10,
+        userId: 'user-1',
+      };
+      const orders = [
+        { id: 'order-1', userId: 'user-1' },
+        { id: 'order-2', userId: 'user-1' },
+      ] as Order[];
+      const total = 2;
+
+      const createQueryBuilderMock = {
+        andWhere: jest.fn().mockReturnThis(),
+        orderBy: jest.fn().mockReturnThis(),
+        skip: jest.fn().mockReturnThis(),
+        take: jest.fn().mockReturnThis(),
+        getManyAndCount: jest.fn().mockResolvedValue([orders, total]),
+      };
+
+      typeormRepository.createQueryBuilder = jest
+        .fn()
+        .mockReturnValue(createQueryBuilderMock);
+
+      await expect(repository.findAll(options)).resolves.toEqual({
+        data: orders,
+        total,
+      });
+      expect(typeormRepository.createQueryBuilder).toHaveBeenCalledWith(
+        'order',
+      );
+      expect(createQueryBuilderMock.andWhere).toHaveBeenCalledWith(
+        'order.userId = :userId',
+        { userId: options.userId },
+      );
+    });
+  });
+
+  describe('updateStatus', () => {
+    it('updates order status', async () => {
+      const orderId = 'order-1';
+      const newStatus = OrderStatus.CONFIRMED;
+      const updatedOrder = { id: orderId, status: newStatus } as Order;
+
+      typeormRepository.update.mockResolvedValue({ affected: 1 });
+
+      const findByIdMock = jest.fn().mockResolvedValue(updatedOrder);
+      repository.findById = findByIdMock;
+
+      await expect(
+        repository.updateStatus(orderId, newStatus),
+      ).resolves.toEqual(updatedOrder);
+      expect(typeormRepository.update).toHaveBeenCalledWith(orderId, {
+        status: newStatus,
+      });
+      expect(findByIdMock).toHaveBeenCalledWith(orderId);
+    });
   });
 });

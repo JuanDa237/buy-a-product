@@ -6,10 +6,12 @@ import {
   ParseUUIDPipe,
   Post,
   Put,
+  Query,
 } from '@nestjs/common';
 import { OrdersService } from '../services/orders.service';
 import { CreateOrderDto } from '../dto/create-order.dto';
 import { UpdateOrderStatusDto } from '../dto/update-order-status.dto';
+import { QueryOrdersDto } from '../dto/query-orders.dto';
 
 @Controller('orders')
 export class OrdersController {
@@ -18,6 +20,11 @@ export class OrdersController {
   @Post()
   create(@Body() dto: CreateOrderDto) {
     return this.ordersService.create(dto);
+  }
+
+  @Get()
+  findAll(@Query() query: QueryOrdersDto) {
+    return this.ordersService.findAll(query);
   }
 
   @Get(':id')

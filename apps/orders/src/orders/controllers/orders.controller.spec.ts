@@ -8,6 +8,7 @@ describe('OrdersController', () => {
   let ordersController: OrdersController;
   let ordersService: {
     create: jest.Mock;
+    findAll: jest.Mock;
     findOne: jest.Mock;
     updateStatus: jest.Mock;
   };
@@ -24,6 +25,7 @@ describe('OrdersController', () => {
   beforeEach(async () => {
     ordersService = {
       create: jest.fn(),
+      findAll: jest.fn(),
       findOne: jest.fn(),
       updateStatus: jest.fn(),
     };
@@ -51,6 +53,20 @@ describe('OrdersController', () => {
         orderResponse,
       );
       expect(ordersService.create).toHaveBeenCalledWith(dto);
+    });
+  });
+
+  describe('findAll', () => {
+    it('delegates to service and returns list of orders', async () => {
+      const query = { status: OrderStatus.PENDING, userId: 'user-1' };
+      const ordersList = [orderResponse];
+
+      ordersService.findAll.mockResolvedValue(ordersList);
+
+      await expect(ordersController.findAll(query)).resolves.toEqual(
+        ordersList,
+      );
+      expect(ordersService.findAll).toHaveBeenCalledWith(query);
     });
   });
 

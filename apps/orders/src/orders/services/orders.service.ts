@@ -10,6 +10,7 @@ import { CreateOrderDto } from '../dto/create-order.dto';
 import { OrderStatus } from '../enums/order-status.enum';
 import { UpdateOrderStatusDto } from '../dto/update-order-status.dto';
 import { VALID_STATUS_TRANSITIONS } from '../constants/order-status-transitions';
+import { QueryOrdersDto } from '../dto/query-orders.dto';
 
 @Injectable()
 export class OrdersService {
@@ -20,6 +21,11 @@ export class OrdersService {
       ...dto,
       status: OrderStatus.PENDING,
     } as Order);
+  }
+
+  async findAll(query: QueryOrdersDto) {
+    const { status, userId, page = 1, limit = 10 } = query;
+    return this.ordersRepository.findAll({ status, userId, page, limit });
   }
 
   async findOne(id: string): Promise<Order> {
