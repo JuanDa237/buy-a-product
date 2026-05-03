@@ -20,13 +20,13 @@ import { VALID_STATUS_TRANSITIONS } from '../constants/order-status-transitions'
 
 // Common
 import { OrderStatus, OrderStatusChangedEvent } from '@app/orders-common';
-import { AUDIT_SERVICE } from '@app/common';
+import { AUDIT_MICROSERVICE } from '@app/audit-common';
 
 @Injectable()
 export class OrdersService {
   constructor(
     private readonly ordersRepository: OrdersRepository,
-    @Inject(AUDIT_SERVICE) private readonly auditClient: ClientProxy,
+    @Inject(AUDIT_MICROSERVICE) private readonly auditClient: ClientProxy,
   ) {}
 
   async create(dto: CreateOrderDto): Promise<Order> {

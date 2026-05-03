@@ -3,7 +3,8 @@ import { INestApplication, ValidationPipe } from '@nestjs/common';
 import request from 'supertest';
 import { Server } from 'http';
 
-import { AUDIT_SERVICE, HealthModule } from '@app/common';
+import { AUDIT_MICROSERVICE } from '@app/audit-common';
+import { HealthModule } from '@app/common';
 import { OrderStatus } from '@app/orders-common';
 
 import { OrdersController } from '../src/orders/controllers/orders.controller';
@@ -33,7 +34,7 @@ describe('Orders to Audit integration (e2e)', () => {
       providers: [
         OrdersService,
         { provide: OrdersRepository, useValue: ordersRepository },
-        { provide: AUDIT_SERVICE, useValue: auditClient },
+        { provide: AUDIT_MICROSERVICE, useValue: auditClient },
       ],
     }).compile();
 
