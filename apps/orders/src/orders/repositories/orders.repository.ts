@@ -1,6 +1,6 @@
 import { Logger } from '@nestjs/common';
 
-import { AbstractRepository } from '@app/common/database';
+import { AbstractRepository } from '@app/common/features/database';
 import { Order } from '../entities/order.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';

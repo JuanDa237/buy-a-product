@@ -9,7 +9,7 @@ import { OrdersRepository } from './orders/repositories/orders.repository';
 
 // Libs
 import { HealthModule } from '@app/common';
-import { SqlDatabaseModule } from '@app/common/database';
+import { SqlDatabaseModule } from '@app/common/features/database';
 
 @Module({
   imports: [
