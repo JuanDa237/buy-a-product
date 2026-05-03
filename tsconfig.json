@@ -22,6 +22,12 @@
     "noFallthroughCasesInSwitch": false,
     "baseUrl": "./",
     "paths": {
+      "@app/audit-common": [
+        "libs/audit-common/src"
+      ],
+      "@app/audit-common/*": [
+        "libs/audit-common/src/*"
+      ],
       "@app/common": [
         "libs/common/src"
       ],

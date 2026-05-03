@@ -2,6 +2,7 @@ import { OrdersService } from './orders.service';
 import { OrdersRepository } from '../repositories/orders.repository';
 import { CreateOrderDto } from '../dto/create-order.dto';
 import { OrderStatus } from '@app/orders-common';
+import { ClientProxy } from '@nestjs/microservices';
 
 describe('OrdersService', () => {
   let service: OrdersService;
@@ -11,6 +12,7 @@ describe('OrdersService', () => {
     updateStatus: jest.Mock;
     findAll: jest.Mock;
   };
+  let auditClient: Pick<ClientProxy, 'emit'>;
 
   beforeEach(() => {
     ordersRepository = {
@@ -20,8 +22,13 @@ describe('OrdersService', () => {
       findAll: jest.fn(),
     };
 
+    auditClient = {
+      emit: jest.fn(),
+    };
+
     service = new OrdersService(
       ordersRepository as unknown as OrdersRepository,
+      auditClient as ClientProxy,
     );
   });
 
@@ -45,6 +52,11 @@ describe('OrdersService', () => {
     expect(ordersRepository.create).toHaveBeenCalledWith({
       ...dto,
       status: OrderStatus.PENDING,
+    });
+    expect(auditClient.emit).toHaveBeenCalledWith('order.status.changed', {
+      orderId: saved.id,
+      fromStatus: null,
+      toStatus: OrderStatus.PENDING,
     });
   });
 
@@ -106,6 +118,11 @@ describe('OrdersService', () => {
         id,
         updatedOrder.status,
       );
+      expect(auditClient.emit).toHaveBeenCalledWith('order.status.changed', {
+        orderId: id,
+        fromStatus: existingOrder.status,
+        toStatus: updatedOrder.status,
+      });
     });
 
     it('updateStatus throws BadRequestException for invalid transition', async () => {
@@ -129,6 +146,7 @@ describe('OrdersService', () => {
 
       expect(ordersRepository.findById).toHaveBeenCalledWith(id);
       expect(ordersRepository.updateStatus).not.toHaveBeenCalled();
+      expect(auditClient.emit).not.toHaveBeenCalled();
     });
 
     it('updateStatus throws BadRequestException if repository update fails', async () => {
@@ -154,6 +172,7 @@ describe('OrdersService', () => {
         id,
         OrderStatus.CONFIRMED,
       );
+      expect(auditClient.emit).not.toHaveBeenCalled();
     });
   });
 });

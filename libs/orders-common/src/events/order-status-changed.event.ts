@@ -4,6 +4,5 @@ export class OrderStatusChangedEvent {
   orderId!: string;
   fromStatus!: OrderStatus | null;
   toStatus!: OrderStatus;
-  timestamp!: Date;
   metadata?: Record<string, unknown>;
 }

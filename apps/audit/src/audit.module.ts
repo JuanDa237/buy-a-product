@@ -4,6 +4,7 @@ import { ConfigModule } from '@nestjs/config';
 // App
 import { AuditService } from './audit/services/audit.service';
 import { AuditController } from './audit/controllers/audit.controller';
+import { AuditRepository } from './audit/repositories/audit.repository';
 
 // Libs
 import { HealthModule, NoSqlDatabaseModule } from '@app/common';
@@ -27,6 +28,6 @@ import {
     ]),
   ],
   controllers: [AuditController],
-  providers: [AuditService],
+  providers: [AuditService, AuditRepository],
 })
 export class AuditModule {}

@@ -1,7 +1,11 @@
 import { AbstractDocument } from '@app/common/features/database/no-sql/abstract.schema';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
-@Schema()
+@Schema({
+  collection: 'audit_events',
+  timestamps: true,
+  versionKey: false,
+})
 export class AuditEventDocument extends AbstractDocument {
   @Prop({ required: true, index: true })
   orderId!: string;

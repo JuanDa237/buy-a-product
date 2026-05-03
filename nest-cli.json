@@ -19,6 +19,15 @@
         "tsConfigPath": "apps/audit/tsconfig.app.json"
       }
     },
+    "audit-common": {
+      "type": "library",
+      "root": "libs/audit-common",
+      "entryFile": "index",
+      "sourceRoot": "libs/audit-common/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/audit-common/tsconfig.lib.json"
+      }
+    },
     "common": {
       "type": "library",
       "root": "libs/common",

@@ -1,8 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
-import { AuditModule } from './../src/audit.module';
+import { HealthModule } from '@app/common';
 import { Server } from 'http';
+import { AuditController } from '../src/audit/controllers/audit.controller';
+import { AuditService } from '../src/audit/services/audit.service';
 
 interface HealthResponse {
   status: string;
@@ -12,18 +14,27 @@ interface HealthResponse {
 
 describe('AuditController (e2e)', () => {
   let app: INestApplication;
+  let auditService: { getAuditLog: jest.Mock };
 
-  beforeEach(async () => {
+  beforeAll(async () => {
+    auditService = {
+      getAuditLog: jest.fn(),
+    };
+
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AuditModule],
+      imports: [HealthModule],
+      controllers: [AuditController],
+      providers: [{ provide: AuditService, useValue: auditService }],
     }).compile();
 
     app = moduleFixture.createNestApplication();
     await app.init();
   });
 
-  afterEach(async () => {
-    await app.close();
+  afterAll(async () => {
+    if (app) {
+      await app.close();
+    }
   });
 
   it('/ (GET) returns health payload', async () => {
@@ -39,10 +50,25 @@ describe('AuditController (e2e)', () => {
     expect(new Date(body.timestamp).toISOString()).toBe(body.timestamp);
   });
 
-  it('/hello (GET) returns hello world', async () => {
-    await request(app.getHttpServer() as Server)
-      .get('/hello')
-      .expect(200)
-      .expect('Hello World!');
+  it('/audit/:orderId (GET) returns audit log for order', async () => {
+    const orderId = '123';
+    const expectedLog = [
+      {
+        orderId,
+        fromStatus: 'PENDING',
+        toStatus: 'CONFIRMED',
+        metadata: { actor: 'system' },
+        createdAt: '2026-01-01T00:00:00.000Z',
+      },
+    ];
+
+    auditService.getAuditLog.mockResolvedValue(expectedLog);
+
+    const response = await request(app.getHttpServer() as Server)
+      .get(`/audit/${orderId}`)
+      .expect(200);
+
+    expect(response.body).toEqual(expectedLog);
+    expect(auditService.getAuditLog).toHaveBeenCalledWith(orderId);
   });
 });

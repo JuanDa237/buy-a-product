@@ -1,26 +1,43 @@
 import {
   BadRequestException,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { ClientProxy } from '@nestjs/microservices';
 
+// Repositories
 import { OrdersRepository } from '../repositories/orders.repository';
+
+// Entities & DTOs
 import { Order } from '../entities/order.entity';
 import { CreateOrderDto } from '../dto/create-order.dto';
-import { OrderStatus } from '@app/orders-common';
 import { UpdateOrderStatusDto } from '../dto/update-order-status.dto';
-import { VALID_STATUS_TRANSITIONS } from '../constants/order-status-transitions';
 import { QueryOrdersDto } from '../dto/query-orders.dto';
+
+// Constants
+import { VALID_STATUS_TRANSITIONS } from '../constants/order-status-transitions';
+
+// Common
+import { OrderStatus, OrderStatusChangedEvent } from '@app/orders-common';
+import { AUDIT_SERVICE } from '@app/common';
 
 @Injectable()
 export class OrdersService {
-  constructor(private readonly ordersRepository: OrdersRepository) {}
+  constructor(
+    private readonly ordersRepository: OrdersRepository,
+    @Inject(AUDIT_SERVICE) private readonly auditClient: ClientProxy,
+  ) {}
 
   async create(dto: CreateOrderDto): Promise<Order> {
-    return this.ordersRepository.create({
+    const order = await this.ordersRepository.create({
       ...dto,
       status: OrderStatus.PENDING,
     } as Order);
+
+    this.emitStatusChanged(order.id, null, OrderStatus.PENDING);
+
+    return order;
   }
 
   async findAll(query: QueryOrdersDto) {
@@ -53,6 +70,23 @@ export class OrdersService {
       );
     }
 
+    this.emitStatusChanged(id, fromStatus, newStatus);
+
     return updated;
+  }
+
+  // Events
+  private emitStatusChanged(
+    orderId: string,
+    fromStatus: OrderStatus | null,
+    toStatus: OrderStatus,
+  ): void {
+    const event: OrderStatusChangedEvent = {
+      orderId,
+      fromStatus,
+      toStatus,
+    };
+
+    this.auditClient.emit('order.status.changed', event);
   }
 }

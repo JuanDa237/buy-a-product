@@ -9,6 +9,7 @@ import { OrdersRepository } from './orders/repositories/orders.repository';
 
 // Libs
 import { HealthModule, SqlDatabaseModule } from '@app/common';
+import { AuditTCPModule } from '@app/audit-common';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { HealthModule, SqlDatabaseModule } from '@app/common';
     ConfigModule.forRoot({ isGlobal: true }),
     SqlDatabaseModule,
     SqlDatabaseModule.forFeature([Order]),
+    AuditTCPModule,
   ],
   controllers: [OrdersController],
   providers: [OrdersService, OrdersRepository],

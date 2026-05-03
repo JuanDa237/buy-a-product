@@ -1,7 +1,7 @@
 import { Prop, Schema } from '@nestjs/mongoose';
 import { SchemaTypes, Types } from 'mongoose';
 
-@Schema({ timestamps: true })
+@Schema({ timestamps: true, versionKey: false })
 export abstract class AbstractDocument {
   @Prop({ type: SchemaTypes.ObjectId })
   _id!: Types.ObjectId;

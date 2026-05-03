@@ -91,6 +91,7 @@
       "<rootDir>/libs/"
     ],
     "moduleNameMapper": {
+      "^@app/audit-common(|/.*)$": "<rootDir>/libs/audit-common/src/$1",
       "^@app/common(|/.*)$": "<rootDir>/libs/common/src/$1",
       "^@app/orders-common(|/.*)$": "<rootDir>/libs/orders-common/src/$1"
     }
