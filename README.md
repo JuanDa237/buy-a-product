@@ -10,6 +10,22 @@ The solution focuses on:
 - Practical developer experience (Docker, hot reload, debug)
 - Strong automated testing and high coverage discipline
 
+## Table of Contents
+
+- [Tech Stack](#tech-stack)
+- [Architecture Overview](#architecture-overview)
+- [Why this design](#why-this-design)
+- [Why I chose the NestJS monorepo option](#why-i-chose-the-nestjs-monorepo-option)
+- [Quick Start (Easiest Way)](#quick-start-easiest-way)
+- [API Summary](#api-summary)
+- [Tests](#tests)
+- [Coverage and 100% Policy](#coverage-and-100-policy)
+- [Hot Reloading](#hot-reloading)
+- [Debugging (including Windows)](#debugging-including-windows)
+- [AI Integration With Skills (Solution-Specific)](#ai-integration-with-skills-solution-specific)
+- [Local (Non-Docker) Run (Optional)](#local-non-docker-run-optional)
+- [Useful Commands](#useful-commands)
+
 ## Tech Stack
 
 - Node.js + NestJS
