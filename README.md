@@ -71,7 +71,11 @@ Storage:
 ### 3) Shared Libraries
 
 - libs/common
-  - Cross-cutting modules (health checks, throttling, SQL/NoSQL base modules and repository abstractions)
+  - Cross-cutting modules shared by services:
+    - Health module: provides a lightweight readiness/smoke-check endpoint so each service can be verified quickly by developers, Docker, and external monitors.
+    - Logger module: centralizes structured HTTP logging so request flow and failures are easier to inspect consistently across services.
+    - Throttling module: applies reusable rate limiting to HTTP endpoints, which helps protect services from bursts, abuse, and noisy clients.
+    - Database modules: reusable SQL/NoSQL base modules and repository abstractions to reduce duplicated infrastructure code.
 - libs/orders-common
   - Order domain contract: status enum + event payload contract
 - libs/audit-common
@@ -233,6 +237,17 @@ Coverage collection is intentionally focused on implementation code and excludes
 
 This keeps coverage centered on business and reusable logic while still validating runtime wiring through e2e suites.
 
+## Code Quality During Development
+
+During development, I consistently ran the following checks to keep the codebase clean and aligned with project rules:
+
+```bash
+pnpm format
+pnpm lint
+```
+
+This helps enforce consistent formatting and linting standards across apps and shared libs. The implementation code in this repository is kept clean of known linting and TypeScript errors, not just formatted to look consistent.
+
 ## Hot Reloading
 
 Hot reloading is already configured in Docker using bind mounts plus watch mode commands.
@@ -374,6 +389,7 @@ You must provide accessible local PostgreSQL and MongoDB instances and configure
 
 ```bash
 pnpm build
+pnpm format
 pnpm lint
 pnpm test
 pnpm test:cov
