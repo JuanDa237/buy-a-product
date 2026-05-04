@@ -153,6 +153,20 @@ curl http://localhost:3000/
 curl http://localhost:3001/
 ```
 
+### 4) Optional startup seed data for orders
+
+If you want to automatically insert sample orders on startup (local/dev only), set this in `.env`:
+
+```bash
+SEED_ORDERS_ON_STARTUP=true
+```
+
+Behavior:
+
+- Seeding runs when the orders service starts.
+- It is idempotent for the bootstrap flow: data is inserted only when the `orders` table is empty.
+- If there are existing records, seeding is skipped.
+
 ## API Summary
 
 Both services expose interactive Swagger UI documentation where you can explore and test all endpoints directly from the browser:

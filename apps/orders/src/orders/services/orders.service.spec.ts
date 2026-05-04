@@ -13,6 +13,7 @@ describe('OrdersService', () => {
     findAll: jest.Mock;
     searchByText: jest.Mock;
     ensureSearchInfrastructure: jest.Mock;
+    seedStartupDataIfEmpty: jest.Mock;
   };
   let auditClient: Pick<ClientProxy, 'emit'>;
 
@@ -24,6 +25,7 @@ describe('OrdersService', () => {
       findAll: jest.fn(),
       searchByText: jest.fn(),
       ensureSearchInfrastructure: jest.fn(),
+      seedStartupDataIfEmpty: jest.fn(),
     };
 
     auditClient = {
@@ -34,6 +36,10 @@ describe('OrdersService', () => {
       ordersRepository as unknown as OrdersRepository,
       auditClient as ClientProxy,
     );
+  });
+
+  afterEach(() => {
+    delete process.env.SEED_ORDERS_ON_STARTUP;
   });
 
   it('create sets status as PENDING and delegates to repository', async () => {
@@ -65,12 +71,27 @@ describe('OrdersService', () => {
   });
 
   it('onModuleInit ensures search infrastructure', async () => {
+    process.env.SEED_ORDERS_ON_STARTUP = 'false';
     ordersRepository.ensureSearchInfrastructure.mockResolvedValue(undefined);
 
     await expect(service.onModuleInit()).resolves.toBeUndefined();
     expect(ordersRepository.ensureSearchInfrastructure).toHaveBeenCalledTimes(
       1,
     );
+    expect(ordersRepository.seedStartupDataIfEmpty).not.toHaveBeenCalled();
+  });
+
+  it('onModuleInit seeds startup data when enabled', async () => {
+    process.env.SEED_ORDERS_ON_STARTUP = 'true';
+    ordersRepository.ensureSearchInfrastructure.mockResolvedValue(undefined);
+    ordersRepository.seedStartupDataIfEmpty.mockResolvedValue(12);
+
+    await expect(service.onModuleInit()).resolves.toBeUndefined();
+
+    expect(ordersRepository.ensureSearchInfrastructure).toHaveBeenCalledTimes(
+      1,
+    );
+    expect(ordersRepository.seedStartupDataIfEmpty).toHaveBeenCalledTimes(1);
   });
 
   describe('findAll', () => {

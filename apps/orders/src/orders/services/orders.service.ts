@@ -32,6 +32,13 @@ export class OrdersService implements OnModuleInit {
 
   async onModuleInit(): Promise<void> {
     await this.ordersRepository.ensureSearchInfrastructure();
+
+    const shouldSeed = process.env.SEED_ORDERS_ON_STARTUP === 'true';
+    if (!shouldSeed) {
+      return;
+    }
+
+    await this.ordersRepository.seedStartupDataIfEmpty();
   }
 
   async create(dto: CreateOrderDto): Promise<Order> {

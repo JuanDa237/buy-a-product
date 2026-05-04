@@ -11,6 +11,7 @@ describe('OrdersRepository', () => {
     findOne: jest.Mock;
     create: jest.Mock;
     save: jest.Mock;
+    count: jest.Mock;
     update: jest.Mock;
     createQueryBuilder: jest.Mock;
     query: jest.Mock;
@@ -21,6 +22,7 @@ describe('OrdersRepository', () => {
       findOne: jest.fn(),
       create: jest.fn(),
       save: jest.fn(),
+      count: jest.fn(),
       update: jest.fn(),
       createQueryBuilder: jest.fn(),
       query: jest.fn(),
@@ -238,6 +240,30 @@ describe('OrdersRepository', () => {
       );
       expect(createQueryBuilderMock.skip).toHaveBeenCalledWith(0);
       expect(createQueryBuilderMock.take).toHaveBeenCalledWith(10);
+    });
+  });
+
+  describe('seedStartupDataIfEmpty', () => {
+    it('inserts startup orders when repository is empty', async () => {
+      typeormRepository.count.mockResolvedValue(0);
+      typeormRepository.create.mockImplementation((input: Order) => input);
+      typeormRepository.save.mockResolvedValue([]);
+
+      await expect(repository.seedStartupDataIfEmpty()).resolves.toBe(12);
+
+      expect(typeormRepository.count).toHaveBeenCalledTimes(1);
+      expect(typeormRepository.create).toHaveBeenCalledTimes(12);
+      expect(typeormRepository.save).toHaveBeenCalledTimes(1);
+    });
+
+    it('skips startup insert when table has data', async () => {
+      typeormRepository.count.mockResolvedValue(1);
+
+      await expect(repository.seedStartupDataIfEmpty()).resolves.toBe(0);
+
+      expect(typeormRepository.count).toHaveBeenCalledTimes(1);
+      expect(typeormRepository.create).not.toHaveBeenCalled();
+      expect(typeormRepository.save).not.toHaveBeenCalled();
     });
   });
 });

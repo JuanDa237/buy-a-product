@@ -6,6 +6,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { OrderStatus } from '@app/orders-common';
 import { FindAllOptions } from '../interfaces/find-all-options';
+import { STARTUP_SEED_ORDERS } from '../seed/orders';
 
 export class OrdersRepository extends AbstractEntityRepository<Order> {
   protected readonly logger: Logger = new Logger(OrdersRepository.name);
@@ -92,5 +93,23 @@ export class OrdersRepository extends AbstractEntityRepository<Order> {
 
     const [data, total] = await qb.getManyAndCount();
     return { data, total };
+  }
+
+  async seedStartupDataIfEmpty(): Promise<number> {
+    const currentCount = await this.repo.count();
+    if (currentCount > 0) {
+      this.logger.log(
+        'Skipping startup seed because orders table is not empty',
+      );
+      return 0;
+    }
+
+    const payload = STARTUP_SEED_ORDERS.map((order) =>
+      this.repo.create(order as Order),
+    );
+    await this.repo.save(payload);
+
+    this.logger.log(`Inserted ${payload.length} startup test orders`);
+    return payload.length;
   }
 }
