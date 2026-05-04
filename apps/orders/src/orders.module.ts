@@ -8,7 +8,11 @@ import { Order } from './orders/entities/order.entity';
 import { OrdersRepository } from './orders/repositories/orders.repository';
 
 // Libs
-import { HealthModule, SqlDatabaseModule } from '@app/common';
+import {
+  CommonThrottlerModule,
+  HealthModule,
+  SqlDatabaseModule,
+} from '@app/common';
 import { AuditTCPModule } from '@app/audit-common';
 
 @Module({
@@ -18,6 +22,7 @@ import { AuditTCPModule } from '@app/audit-common';
     SqlDatabaseModule,
     SqlDatabaseModule.forFeature([Order]),
     AuditTCPModule,
+    CommonThrottlerModule,
   ],
   controllers: [OrdersController],
   providers: [OrdersService, OrdersRepository],

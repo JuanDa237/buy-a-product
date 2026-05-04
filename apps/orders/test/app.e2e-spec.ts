@@ -1,7 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import request from 'supertest';
-import { HealthModule } from '@app/common';
+import { CommonThrottlerModule, HealthModule } from '@app/common';
 import { OrdersController } from '../src/orders/controllers/orders.controller';
 import { OrdersService } from '../src/orders/services/orders.service';
 import { OrderStatus } from '@app/orders-common';
@@ -15,6 +16,7 @@ interface HealthResponse {
 
 describe('OrdersController (e2e)', () => {
   let app: INestApplication;
+  let originalThrottleLimit: string | undefined;
   const ordersService = {
     create: jest.fn(),
     findOne: jest.fn(),
@@ -23,9 +25,15 @@ describe('OrdersController (e2e)', () => {
 
   beforeEach(async () => {
     jest.clearAllMocks();
+    originalThrottleLimit = process.env.THROTTLE_LIMIT;
+    process.env.THROTTLE_LIMIT = '1';
 
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [HealthModule],
+      imports: [
+        ConfigModule.forRoot({ isGlobal: true }),
+        HealthModule,
+        CommonThrottlerModule,
+      ],
       controllers: [OrdersController],
       providers: [{ provide: OrdersService, useValue: ordersService }],
     }).compile();
@@ -44,6 +52,12 @@ describe('OrdersController (e2e)', () => {
 
   afterEach(async () => {
     await app.close();
+
+    if (originalThrottleLimit === undefined) {
+      delete process.env.THROTTLE_LIMIT;
+    } else {
+      process.env.THROTTLE_LIMIT = originalThrottleLimit;
+    }
   });
 
   it('/ (GET) returns health payload', async () => {
@@ -197,5 +211,38 @@ describe('OrdersController (e2e)', () => {
       .get(`/orders/${id}`)
       .expect(200)
       .expect(responseOrder);
+  });
+
+  it('/orders (POST) returns 429 when the request limit is exceeded', async () => {
+    const responseOrder = {
+      id: 'f7932cad-af29-460e-938f-2ec9e57c0a33',
+      productId: 'product-1',
+      quantity: 2,
+      userId: 'user-1',
+      totalAmount: 150,
+      status: OrderStatus.PENDING,
+    };
+
+    ordersService.create.mockResolvedValue(responseOrder);
+
+    await request(app.getHttpServer() as Server)
+      .post('/orders')
+      .send({
+        productId: 'product-1',
+        quantity: 2,
+        userId: 'user-1',
+        totalAmount: 150,
+      })
+      .expect(201);
+
+    await request(app.getHttpServer() as Server)
+      .post('/orders')
+      .send({
+        productId: 'product-1',
+        quantity: 2,
+        userId: 'user-1',
+        totalAmount: 150,
+      })
+      .expect(429);
   });
 });

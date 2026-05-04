@@ -7,7 +7,11 @@ import { AuditController } from './audit/controllers/audit.controller';
 import { AuditRepository } from './audit/repositories/audit.repository';
 
 // Libs
-import { HealthModule, NoSqlDatabaseModule } from '@app/common';
+import {
+  CommonThrottlerModule,
+  HealthModule,
+  NoSqlDatabaseModule,
+} from '@app/common';
 
 // Schemas
 import {
@@ -26,6 +30,7 @@ import {
         schema: AuditEventSchema,
       },
     ]),
+    CommonThrottlerModule,
   ],
   controllers: [AuditController],
   providers: [AuditService, AuditRepository],

@@ -1,7 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import request from 'supertest';
-import { HealthModule } from '@app/common';
+import { CommonThrottlerModule, HealthModule } from '@app/common';
 import { Server } from 'http';
 import { AuditController } from '../src/audit/controllers/audit.controller';
 import { AuditService } from '../src/audit/services/audit.service';
@@ -15,14 +16,23 @@ interface HealthResponse {
 describe('AuditController (e2e)', () => {
   let app: INestApplication;
   let auditService: { getAuditLog: jest.Mock };
+  let originalThrottleLimit: string | undefined;
 
-  beforeAll(async () => {
+  beforeEach(async () => {
+    originalThrottleLimit = process.env.THROTTLE_LIMIT;
+
     auditService = {
       getAuditLog: jest.fn(),
     };
 
+    process.env.THROTTLE_LIMIT = '1';
+
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [HealthModule],
+      imports: [
+        ConfigModule.forRoot({ isGlobal: true }),
+        HealthModule,
+        CommonThrottlerModule,
+      ],
       controllers: [AuditController],
       providers: [{ provide: AuditService, useValue: auditService }],
     }).compile();
@@ -31,9 +41,15 @@ describe('AuditController (e2e)', () => {
     await app.init();
   });
 
-  afterAll(async () => {
+  afterEach(async () => {
     if (app) {
       await app.close();
+    }
+
+    if (originalThrottleLimit === undefined) {
+      delete process.env.THROTTLE_LIMIT;
+    } else {
+      process.env.THROTTLE_LIMIT = originalThrottleLimit;
     }
   });
 
@@ -70,5 +86,30 @@ describe('AuditController (e2e)', () => {
 
     expect(response.body).toEqual(expectedLog);
     expect(auditService.getAuditLog).toHaveBeenCalledWith(orderId);
+  });
+
+  it('/audit/:orderId (GET) returns 429 when request limit is exceeded', async () => {
+    const orderId = '123';
+    const expectedLog = [
+      {
+        orderId,
+        fromStatus: 'PENDING',
+        toStatus: 'CONFIRMED',
+        metadata: { actor: 'system' },
+        createdAt: '2026-01-01T00:00:00.000Z',
+      },
+    ];
+
+    auditService.getAuditLog.mockResolvedValue(expectedLog);
+
+    await request(app.getHttpServer() as Server)
+      .get(`/audit/${orderId}`)
+      .expect(200);
+
+    await request(app.getHttpServer() as Server)
+      .get(`/audit/${orderId}`)
+      .expect(429);
+
+    expect(auditService.getAuditLog).toHaveBeenCalledTimes(1);
   });
 });
