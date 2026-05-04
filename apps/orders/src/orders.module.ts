@@ -13,6 +13,7 @@ import {
   HealthModule,
   SqlDatabaseModule,
   LoggerModule,
+  AuthModule,
 } from '@app/common';
 import { AuditTCPModule } from '@app/audit-common';
 
@@ -25,6 +26,7 @@ import { AuditTCPModule } from '@app/audit-common';
     AuditTCPModule,
     ThrottlerModule,
     LoggerModule,
+    AuthModule,
   ],
   controllers: [OrdersController],
   providers: [OrdersService, OrdersRepository],

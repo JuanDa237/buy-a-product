@@ -17,6 +17,8 @@ async function bootstrap() {
     .setTitle('Orders API')
     .setDescription('Orders microservice REST API')
     .setVersion('1.0')
+    .addApiKey({ type: 'apiKey', in: 'header', name: 'x-api-key' }, 'x-api-key')
+    .addSecurityRequirements('x-api-key')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

@@ -29,6 +29,8 @@ async function bootstrap() {
     .setTitle('Audit API')
     .setDescription('Audit microservice REST API')
     .setVersion('1.0')
+    .addApiKey({ type: 'apiKey', in: 'header', name: 'x-api-key' }, 'x-api-key')
+    .addSecurityRequirements('x-api-key')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

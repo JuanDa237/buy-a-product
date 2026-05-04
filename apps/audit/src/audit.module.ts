@@ -12,6 +12,7 @@ import {
   HealthModule,
   NoSqlDatabaseModule,
   LoggerModule,
+  AuthModule,
 } from '@app/common';
 
 // Schemas
@@ -33,6 +34,7 @@ import {
     ]),
     ThrottlerModule,
     LoggerModule,
+    AuthModule,
   ],
   controllers: [AuditController],
   providers: [AuditService, AuditRepository],

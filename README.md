@@ -18,6 +18,7 @@ The solution focuses on:
 - [Why I chose the NestJS monorepo option](#why-i-chose-the-nestjs-monorepo-option)
 - [Quick Start (Easiest Way)](#quick-start-easiest-way)
 - [API Summary](#api-summary)
+- [Authentication](#authentication)
 - [Tests](#tests)
 - [Coverage and 100% Policy](#coverage-and-100-policy)
 - [Hot Reloading](#hot-reloading)
@@ -75,6 +76,7 @@ Storage:
     - Health module: provides a lightweight readiness/smoke-check endpoint so each service can be verified quickly by developers, Docker, and external monitors.
     - Logger module: centralizes structured HTTP logging so request flow and failures are easier to inspect consistently across services.
     - Throttling module: applies reusable rate limiting to HTTP endpoints, which helps protect services from bursts, abuse, and noisy clients.
+    - Auth module: registers a global API key guard for HTTP endpoints in both services. Requests must send the configured `x-api-key` header, while explicitly public routes such as the root health check remain accessible without authentication.
     - Database modules: reusable SQL/NoSQL base modules and repository abstractions to reduce duplicated infrastructure code.
 - libs/orders-common
   - Order domain contract: status enum + event payload contract
@@ -157,6 +159,23 @@ Both services expose interactive Swagger UI documentation where you can explore 
 ### Audit service (http://localhost:3001)
 
 - GET /audit/:orderId
+
+## Authentication
+
+HTTP endpoints are protected through the shared auth feature in `libs/common`.
+
+- The expected header is `x-api-key`.
+- The value is read from `API_KEY` in `.env`.
+- Public health endpoints (`GET /` on each service) are excluded from the guard.
+
+You can test protected endpoints with curl after copying `.env.example` to `.env`:
+
+```bash
+curl -H "x-api-key: your-secure-api-key" http://localhost:3000/orders
+curl -H "x-api-key: your-secure-api-key" http://localhost:3001/audit/<orderId>
+```
+
+If you are using Swagger, open either `/api/docs`, click **Authorize**, and enter the same API key for the `x-api-key` security scheme before trying secured endpoints.
 
 ## Tests
 
