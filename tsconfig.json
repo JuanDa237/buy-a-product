@@ -20,6 +20,7 @@
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "noFallthroughCasesInSwitch": false,
+    // baseUrl (deprecated) and paths are required to make the imports work with the most recent version of NestJS
     "baseUrl": "./",
     "paths": {
       "@app/audit-common": [

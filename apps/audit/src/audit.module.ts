@@ -8,9 +8,10 @@ import { AuditRepository } from './audit/repositories/audit.repository';
 
 // Libs
 import {
-  CommonThrottlerModule,
+  ThrottlerModule,
   HealthModule,
   NoSqlDatabaseModule,
+  LoggerModule,
 } from '@app/common';
 
 // Schemas
@@ -30,7 +31,8 @@ import {
         schema: AuditEventSchema,
       },
     ]),
-    CommonThrottlerModule,
+    ThrottlerModule,
+    LoggerModule,
   ],
   controllers: [AuditController],
   providers: [AuditService, AuditRepository],

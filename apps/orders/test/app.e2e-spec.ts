@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import request from 'supertest';
-import { CommonThrottlerModule, HealthModule } from '@app/common';
+import { ThrottlerModule, HealthModule } from '@app/common';
 import { OrdersController } from '../src/orders/controllers/orders.controller';
 import { OrdersService } from '../src/orders/services/orders.service';
 import { OrderStatus } from '@app/orders-common';
@@ -32,7 +32,7 @@ describe('OrdersController (e2e)', () => {
       imports: [
         ConfigModule.forRoot({ isGlobal: true }),
         HealthModule,
-        CommonThrottlerModule,
+        ThrottlerModule,
       ],
       controllers: [OrdersController],
       providers: [{ provide: OrdersService, useValue: ordersService }],

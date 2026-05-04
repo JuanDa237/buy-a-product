@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import request from 'supertest';
-import { CommonThrottlerModule, HealthModule } from '@app/common';
+import { ThrottlerModule, HealthModule } from '@app/common';
 import { Server } from 'http';
 import { AuditController } from '../src/audit/controllers/audit.controller';
 import { AuditService } from '../src/audit/services/audit.service';
@@ -31,7 +31,7 @@ describe('AuditController (e2e)', () => {
       imports: [
         ConfigModule.forRoot({ isGlobal: true }),
         HealthModule,
-        CommonThrottlerModule,
+        ThrottlerModule,
       ],
       controllers: [AuditController],
       providers: [{ provide: AuditService, useValue: auditService }],

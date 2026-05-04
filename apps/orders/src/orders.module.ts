@@ -9,9 +9,10 @@ import { OrdersRepository } from './orders/repositories/orders.repository';
 
 // Libs
 import {
-  CommonThrottlerModule,
+  ThrottlerModule,
   HealthModule,
   SqlDatabaseModule,
+  LoggerModule,
 } from '@app/common';
 import { AuditTCPModule } from '@app/audit-common';
 
@@ -22,7 +23,8 @@ import { AuditTCPModule } from '@app/audit-common';
     SqlDatabaseModule,
     SqlDatabaseModule.forFeature([Order]),
     AuditTCPModule,
-    CommonThrottlerModule,
+    ThrottlerModule,
+    LoggerModule,
   ],
   controllers: [OrdersController],
   providers: [OrdersService, OrdersRepository],

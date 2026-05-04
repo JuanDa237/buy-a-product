@@ -37,7 +37,11 @@ describe('HttpThrottlerGuard', () => {
       getType: () => 'rpc',
     } as unknown as ExecutionContext;
 
-    const result = await (guard as any).shouldSkip(context);
+    const result = await (
+      guard as unknown as {
+        shouldSkip: (ctx: ExecutionContext) => Promise<boolean>;
+      }
+    ).shouldSkip(context);
 
     expect(result).toBe(true);
     expect(parentShouldSkip).not.toHaveBeenCalled();
