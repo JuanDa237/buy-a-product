@@ -9,6 +9,7 @@ describe('OrdersController', () => {
   let ordersService: {
     create: jest.Mock;
     findAll: jest.Mock;
+    search: jest.Mock;
     findOne: jest.Mock;
     updateStatus: jest.Mock;
   };
@@ -26,6 +27,7 @@ describe('OrdersController', () => {
     ordersService = {
       create: jest.fn(),
       findAll: jest.fn(),
+      search: jest.fn(),
       findOne: jest.fn(),
       updateStatus: jest.fn(),
     };
@@ -79,6 +81,22 @@ describe('OrdersController', () => {
         orderResponse,
       );
       expect(ordersService.findOne).toHaveBeenCalledWith(id);
+    });
+  });
+
+  describe('search', () => {
+    it('delegates to service and returns searched orders', async () => {
+      const query = { q: 'regalo', page: 1, limit: 10 };
+      const result = { data: [orderResponse], total: 1 };
+
+      ordersService.search.mockResolvedValue(result);
+
+      await expect(ordersController.search(query)).resolves.toEqual(result);
+      expect(ordersService.search).toHaveBeenCalledWith(
+        query.q,
+        query.page,
+        query.limit,
+      );
     });
   });
 

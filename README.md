@@ -57,6 +57,17 @@ Storage:
 
 - PostgreSQL (transactional order data)
 
+### pg_trgm Search (Differentiator)
+
+As a differentiator for this take-home, the orders service implements PostgreSQL text search with `pg_trgm`:
+
+- Enables the `pg_trgm` extension at startup (`CREATE EXTENSION IF NOT EXISTS pg_trgm`)
+- Creates a GIN index over `searchText` with `gin_trgm_ops`
+- Exposes `GET /orders/search?q=texto&page=1&limit=10`
+- Uses `ILIKE` filtering plus `similarity()` ranking to return the most relevant matches first
+
+This provides practical fuzzy text search behavior without introducing an external search engine.
+
 ### 2) audit-service
 
 Responsibilities:
@@ -153,6 +164,7 @@ Both services expose interactive Swagger UI documentation where you can explore 
 
 - POST /orders
 - GET /orders
+- GET /orders/search?q=texto&page=1&limit=10
 - GET /orders/:id
 - PUT /orders/:id/status
 

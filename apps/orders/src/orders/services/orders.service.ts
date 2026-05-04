@@ -3,6 +3,7 @@ import {
   Inject,
   Injectable,
   NotFoundException,
+  OnModuleInit,
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 
@@ -23,11 +24,15 @@ import { OrderStatus, OrderStatusChangedEvent } from '@app/orders-common';
 import { AUDIT_MICROSERVICE } from '@app/audit-common';
 
 @Injectable()
-export class OrdersService {
+export class OrdersService implements OnModuleInit {
   constructor(
     private readonly ordersRepository: OrdersRepository,
     @Inject(AUDIT_MICROSERVICE) private readonly auditClient: ClientProxy,
   ) {}
+
+  async onModuleInit(): Promise<void> {
+    await this.ordersRepository.ensureSearchInfrastructure();
+  }
 
   async create(dto: CreateOrderDto): Promise<Order> {
     const order = await this.ordersRepository.create({
@@ -43,6 +48,10 @@ export class OrdersService {
   async findAll(query: QueryOrdersDto) {
     const { status, userId, page = 1, limit = 10 } = query;
     return this.ordersRepository.findAll({ status, userId, page, limit });
+  }
+
+  async search(q: string, page = 1, limit = 10) {
+    return this.ordersRepository.searchByText(q, page, limit);
   }
 
   async findOne(id: string): Promise<Order> {

@@ -1,5 +1,13 @@
-import { IsString, IsInt, Min, IsNumber, IsPositive } from 'class-validator';
+import {
+  IsString,
+  IsInt,
+  Min,
+  IsNumber,
+  IsPositive,
+  IsOptional,
+} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateOrderDto {
   @ApiProperty({ example: 'prod-uuid-123' })
@@ -19,4 +27,11 @@ export class CreateOrderDto {
   @IsNumber()
   @IsPositive()
   totalAmount!: number;
+
+  @ApiPropertyOptional({
+    example: 'Cliente pidió entrega en la tarde y empaque de regalo',
+  })
+  @IsOptional()
+  @IsString()
+  searchText?: string;
 }

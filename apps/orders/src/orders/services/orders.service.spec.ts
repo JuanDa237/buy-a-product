@@ -11,6 +11,8 @@ describe('OrdersService', () => {
     findById: jest.Mock;
     updateStatus: jest.Mock;
     findAll: jest.Mock;
+    searchByText: jest.Mock;
+    ensureSearchInfrastructure: jest.Mock;
   };
   let auditClient: Pick<ClientProxy, 'emit'>;
 
@@ -20,6 +22,8 @@ describe('OrdersService', () => {
       findById: jest.fn(),
       updateStatus: jest.fn(),
       findAll: jest.fn(),
+      searchByText: jest.fn(),
+      ensureSearchInfrastructure: jest.fn(),
     };
 
     auditClient = {
@@ -60,6 +64,15 @@ describe('OrdersService', () => {
     });
   });
 
+  it('onModuleInit ensures search infrastructure', async () => {
+    ordersRepository.ensureSearchInfrastructure.mockResolvedValue(undefined);
+
+    await expect(service.onModuleInit()).resolves.toBeUndefined();
+    expect(ordersRepository.ensureSearchInfrastructure).toHaveBeenCalledTimes(
+      1,
+    );
+  });
+
   describe('findAll', () => {
     it('delegates to repository findAll with correct parameters', async () => {
       const query = { page: 1, limit: 10, status: OrderStatus.PENDING };
@@ -69,6 +82,21 @@ describe('OrdersService', () => {
 
       await expect(service.findAll(query)).resolves.toEqual(result);
       expect(ordersRepository.findAll).toHaveBeenCalledWith(query);
+    });
+  });
+
+  describe('search', () => {
+    it('delegates to repository searchByText', async () => {
+      const result = { data: [], total: 0 };
+
+      ordersRepository.searchByText.mockResolvedValue(result);
+
+      await expect(service.search('regalo', 1, 10)).resolves.toEqual(result);
+      expect(ordersRepository.searchByText).toHaveBeenCalledWith(
+        'regalo',
+        1,
+        10,
+      );
     });
   });
 

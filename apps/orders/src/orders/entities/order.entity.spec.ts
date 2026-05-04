@@ -23,6 +23,7 @@ describe('Order Entity', () => {
         'userId',
         'status',
         'totalAmount',
+        'searchText',
       ]),
     );
   });

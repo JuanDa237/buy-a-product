@@ -19,6 +19,7 @@ describe('Orders to Audit integration (e2e)', () => {
     findById: jest.fn(),
     updateStatus: jest.fn(),
     findAll: jest.fn(),
+    ensureSearchInfrastructure: jest.fn().mockResolvedValue(undefined),
   };
 
   const auditClient = {

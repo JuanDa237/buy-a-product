@@ -21,6 +21,7 @@ describe('OrdersController (e2e)', () => {
     create: jest.fn(),
     findOne: jest.fn(),
     findAll: jest.fn(),
+    search: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -191,6 +192,38 @@ describe('OrdersController (e2e)', () => {
       expect(ordersService.findAll).toHaveBeenCalledWith(
         expect.objectContaining({ userId: 'user-1' }),
       );
+    });
+
+    it('/orders/search?q=regalo (GET) returns matching orders', async () => {
+      const response = {
+        data: [
+          {
+            id: 'f7932cad-af29-460e-938f-2ec9e57c0a33',
+            productId: 'product-1',
+            quantity: 2,
+            userId: 'user-1',
+            totalAmount: 150,
+            status: OrderStatus.PENDING,
+            searchText: 'pedido con empaque de regalo',
+          },
+        ],
+        total: 1,
+      };
+
+      ordersService.search.mockResolvedValue(response);
+
+      await request(app.getHttpServer() as Server)
+        .get('/orders/search?q=regalo')
+        .expect(200)
+        .expect(response);
+
+      expect(ordersService.search).toHaveBeenCalledWith('regalo', 1, 10);
+    });
+
+    it('/orders/search without q (GET) returns 400 Bad Request', async () => {
+      await request(app.getHttpServer() as Server)
+        .get('/orders/search')
+        .expect(400);
     });
   });
 

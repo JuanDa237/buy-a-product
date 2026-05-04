@@ -13,6 +13,7 @@ import { OrdersService } from '../services/orders.service';
 import { CreateOrderDto } from '../dto/create-order.dto';
 import { UpdateOrderStatusDto } from '../dto/update-order-status.dto';
 import { QueryOrdersDto } from '../dto/query-orders.dto';
+import { SearchOrdersDto } from '../dto/search-orders.dto';
 
 @ApiTags('orders')
 @Controller('orders')
@@ -29,6 +30,12 @@ export class OrdersController {
   @Get()
   findAll(@Query() query: QueryOrdersDto) {
     return this.ordersService.findAll(query);
+  }
+
+  @ApiOperation({ summary: 'Search orders by text' })
+  @Get('search')
+  search(@Query() query: SearchOrdersDto) {
+    return this.ordersService.search(query.q, query.page, query.limit);
   }
 
   @ApiOperation({ summary: 'Get a single order by ID' })

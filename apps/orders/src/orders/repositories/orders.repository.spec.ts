@@ -13,6 +13,7 @@ describe('OrdersRepository', () => {
     save: jest.Mock;
     update: jest.Mock;
     createQueryBuilder: jest.Mock;
+    query: jest.Mock;
   };
 
   beforeEach(() => {
@@ -22,6 +23,7 @@ describe('OrdersRepository', () => {
       save: jest.fn(),
       update: jest.fn(),
       createQueryBuilder: jest.fn(),
+      query: jest.fn(),
     };
 
     repository = new OrdersRepository(
@@ -153,6 +155,89 @@ describe('OrdersRepository', () => {
         status: newStatus,
       });
       expect(findByIdMock).toHaveBeenCalledWith(orderId);
+    });
+  });
+
+  describe('ensureSearchInfrastructure', () => {
+    it('creates pg_trgm extension and GIN index', async () => {
+      typeormRepository.query.mockResolvedValue(undefined);
+
+      await expect(
+        repository.ensureSearchInfrastructure(),
+      ).resolves.toBeUndefined();
+
+      expect(typeormRepository.query).toHaveBeenCalledTimes(2);
+      const [extensionSql] = typeormRepository.query.mock.calls[0] as [string];
+      const [indexSql] = typeormRepository.query.mock.calls[1] as [string];
+
+      expect(extensionSql).toContain('pg_trgm');
+      expect(indexSql).toContain('idx_orders_search_vector_gin');
+      expect(indexSql).toContain('gin_trgm_ops');
+    });
+
+    it('logs a warning when index creation fails', async () => {
+      const logger = (repository as unknown as { logger: Logger }).logger;
+      const warnSpy = jest.spyOn(logger, 'warn').mockImplementation();
+
+      typeormRepository.query.mockRejectedValue(new Error('db unavailable'));
+
+      await expect(
+        repository.ensureSearchInfrastructure(),
+      ).resolves.toBeUndefined();
+
+      expect(warnSpy).toHaveBeenCalledWith(
+        expect.stringContaining('db unavailable'),
+      );
+    });
+  });
+
+  describe('searchByText', () => {
+    it('returns paginated orders ranked by similarity with ILIKE', async () => {
+      const orders = [
+        { id: 'order-1', searchText: 'entrega tarde regalo' },
+      ] as Order[];
+      const total = 1;
+
+      const createQueryBuilderMock = {
+        addSelect: jest.fn().mockReturnThis(),
+        where: jest.fn().mockReturnThis(),
+        orderBy: jest.fn().mockReturnThis(),
+        addOrderBy: jest.fn().mockReturnThis(),
+        skip: jest.fn().mockReturnThis(),
+        take: jest.fn().mockReturnThis(),
+        getManyAndCount: jest.fn().mockResolvedValue([orders, total]),
+      };
+
+      typeormRepository.createQueryBuilder = jest
+        .fn()
+        .mockReturnValue(createQueryBuilderMock);
+
+      await expect(repository.searchByText('regalo', 1, 10)).resolves.toEqual({
+        data: orders,
+        total,
+      });
+
+      expect(typeormRepository.createQueryBuilder).toHaveBeenCalledWith(
+        'order',
+      );
+      expect(createQueryBuilderMock.addSelect).toHaveBeenCalledWith(
+        'similarity("order"."searchText", :similarityQuery)',
+        'similarity',
+      );
+      expect(createQueryBuilderMock.where).toHaveBeenCalledWith(
+        '"order"."searchText" ILIKE :query',
+        { query: '%regalo%', similarityQuery: 'regalo' },
+      );
+      expect(createQueryBuilderMock.orderBy).toHaveBeenCalledWith(
+        'similarity',
+        'DESC',
+      );
+      expect(createQueryBuilderMock.addOrderBy).toHaveBeenCalledWith(
+        '"order"."createdAt"',
+        'DESC',
+      );
+      expect(createQueryBuilderMock.skip).toHaveBeenCalledWith(0);
+      expect(createQueryBuilderMock.take).toHaveBeenCalledWith(10);
     });
   });
 });

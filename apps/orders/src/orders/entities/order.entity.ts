@@ -18,4 +18,7 @@ export class Order extends AbstractEntity {
 
   @Column({ type: 'decimal', precision: 10, scale: 2 })
   totalAmount!: number;
+
+  @Column({ type: 'text', default: '' })
+  searchText!: string;
 }
