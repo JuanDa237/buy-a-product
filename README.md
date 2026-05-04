@@ -138,6 +138,11 @@ curl http://localhost:3001/
 
 ## API Summary
 
+Both services expose interactive Swagger UI documentation where you can explore and test all endpoints directly from the browser:
+
+- Orders Swagger UI: http://localhost:3000/api/docs
+- Audit Swagger UI: http://localhost:3001/api/docs
+
 ### Orders service (http://localhost:3000)
 
 - POST /orders
